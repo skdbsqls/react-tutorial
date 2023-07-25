@@ -20,7 +20,9 @@ export default function Header() {
           cursor: "pointer",
         }}
       >
-        <FaHome />
+        <Link to="/">
+          <FaHome />
+        </Link>
       </h1>
       <div
         style={{

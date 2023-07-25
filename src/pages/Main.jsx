@@ -3,8 +3,13 @@ import { useNavigate } from "react-router-dom";
 import Header from "../common/Header";
 import Container from "../common/Container";
 
-export default function Main() {
+export default function Main({ posts, setPosts }) {
   const navigate = useNavigate();
+  const deleteButton = (id) => {
+    const newPosts = posts.filter((post) => post.id !== id);
+    setPosts(newPosts);
+  };
+
   return (
     <>
       <Header />
@@ -32,9 +37,9 @@ export default function Main() {
             추가
           </button>
         </div>
-        {[1, 2, 3, 4].map((item) => (
+        {posts.map((post) => (
           <div
-            key={item}
+            key={post.id}
             style={{
               backgroundColor: "#EEEEEE",
               height: "100px",
@@ -46,7 +51,7 @@ export default function Main() {
           >
             <div
               onClick={() => {
-                navigate("/detail/1");
+                navigate(`/detail/${post.id}`);
               }}
               style={{
                 flex: 4,
@@ -54,7 +59,7 @@ export default function Main() {
                 cursor: "pointer",
               }}
             >
-              <h2>제목</h2>
+              <h2>{post.title}</h2>
               <p
                 style={{
                   width: "300px",
@@ -63,10 +68,7 @@ export default function Main() {
                   whiteSpace: "nowrap",
                 }}
               >
-                Lorem ipsum dolor, sit amet consectetur adipisicing elit.Lorem
-                ipsum dolor, sit amet consectetur adipisicing elit.Lorem ipsum
-                dolor, sit amet consectetur adipisicing elit.Lorem ipsum dolor,
-                sit amet consectetur adipisicing elit.
+                {post.content}
               </p>
             </div>
             <div
@@ -79,11 +81,11 @@ export default function Main() {
                 gap: "12px",
               }}
             >
-              <div>작성자</div>
+              <div>{post.author}</div>
               <div>
                 <button
                   onClick={() => {
-                    navigate("/edit");
+                    navigate(`/edit/${post.id}`);
                   }}
                   style={{
                     border: "none",
@@ -100,6 +102,7 @@ export default function Main() {
                 <button
                   onClick={() => {
                     alert("삭제할까?");
+                    deleteButton(post.id);
                   }}
                   style={{
                     border: "none",

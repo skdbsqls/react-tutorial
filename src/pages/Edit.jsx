@@ -1,8 +1,33 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 import Header from "../common/Header";
 import Container from "../common/Container";
+import { useNavigate, useParams } from "react-router-dom";
 
-export default function Edit() {
+export default function Edit({ posts, setPosts }) {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const post = posts.find((post) => post.id === id);
+
+  const [editedTitle, setEditedTitle] = useState(post.title);
+  const [editedContent, setEditedContent] = useState(post.content);
+
+  const onChangeEditedTitle = (event) => {
+    setEditedTitle(event.target.value);
+  };
+  const onChangeEditedContent = (event) => {
+    setEditedContent(event.target.value);
+  };
+
+  const EditButton = () => {
+    const newPosts = posts.map((post) => {
+      if (post.id === id) {
+        return { ...post, title: editedTitle, content: editedContent };
+      } else return post;
+    });
+    setPosts(newPosts);
+    navigate("/");
+  };
+
   return (
     <Fragment>
       <Header />
@@ -21,6 +46,8 @@ export default function Edit() {
         >
           <div>
             <input
+              value={editedTitle}
+              onChange={onChangeEditedTitle}
               placeholder="제목"
               style={{
                 width: "100%",
@@ -39,6 +66,8 @@ export default function Edit() {
             }}
           >
             <textarea
+              value={editedContent}
+              onChange={onChangeEditedContent}
               placeholder="내용"
               style={{
                 resize: "none",
@@ -53,6 +82,7 @@ export default function Edit() {
             />
           </div>
           <button
+            onClick={EditButton}
             style={{
               width: "100%",
               height: "40px",
