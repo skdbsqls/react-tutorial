@@ -6,21 +6,38 @@ import { useNavigate } from "react-router-dom";
 
 export default function Create({ posts, setPosts }) {
   const navigate = useNavigate();
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  // const [title, setTitle] = useState("");
+  // const [content, setContent] = useState("");
 
-  const onChangeTitle = (event) => {
-    setTitle(event.target.value);
-  };
-  const onChangeContent = (event) => {
-    setContent(event.target.value);
+  // const onChangeTitle = (event) => {
+  //   setTitle(event.target.value);
+  // };
+  // const onChangeContent = (event) => {
+  //   setContent(event.target.value);
+  // };
+
+  // 위를 아래처럼 한 번에 처리해주기!!
+  // 데이터를 한 번에 묶어서 처리하려면? 객체!!
+  const [inputs, setInputs] = useState({
+    title: "",
+    content: "",
+  });
+
+  // name 부여해줌으로써 onChangeHandler로 한 번에 할 수 있음!
+  const changeHandler = (e) => {
+    const { value, name } = e.target;
+    setInputs({
+      ...inputs,
+      [name]: value,
+    });
   };
 
   const addButton = () => {
     const newPost = {
       id: nanoid(),
-      title,
-      content,
+      ...inputs,
+      // title: inputs.title,
+      // content: inputs.content,
     };
     setPosts([...posts, newPost]);
   };
@@ -43,8 +60,9 @@ export default function Create({ posts, setPosts }) {
         >
           <div>
             <input
+              name="title"
               value={title}
-              onChange={onChangeTitle}
+              onChange={changeHandler}
               placeholder="제목"
               style={{
                 width: "100%",
@@ -63,8 +81,9 @@ export default function Create({ posts, setPosts }) {
             }}
           >
             <textarea
+              name="content"
               value={content}
-              onChange={onChangeContent}
+              onChange={changeHandler}
               placeholder="내용"
               style={{
                 resize: "none",

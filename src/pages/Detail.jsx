@@ -6,6 +6,10 @@ import { useNavigate, useParams } from "react-router-dom";
 export default function Detail({ posts, setPosts }) {
   const navigate = useNavigate();
   const { id } = useParams();
+
+  // find는 undefined가 될 수 있음 따라서 undefined 일 때의 처리를 해줘야 됨
+  // 처리해주지 않고 오류를 내버리면 사용자 입장에서 좋지 않기 때문!!
+  // ? 옵션널체이닝으로 처리해 주거나
   const post = posts.find((post) => post.id === id);
 
   const deleteButton = (id) => {
@@ -13,6 +17,10 @@ export default function Detail({ posts, setPosts }) {
     setPosts(newPosts);
   };
 
+  // 존재 하지 않을 경우에 알맞는 페이지?를 처리해주기
+  if (!post) {
+    return <div>해당 게시물은 존재하지 않습니다.</div>;
+  }
   return (
     <>
       <Header />
@@ -24,7 +32,8 @@ export default function Detail({ posts, setPosts }) {
             padding: "12px",
           }}
         >
-          {post.title}
+          {/* 에러 발생 가능성이 있음 -> 사용자 경험에 안좋을 수 있음 */}
+          {post?.title}
         </h1>
         <div
           style={{
@@ -34,7 +43,7 @@ export default function Detail({ posts, setPosts }) {
             padding: "12px",
           }}
         >
-          {post.content}
+          {post?.content}
         </div>
         <div
           style={{

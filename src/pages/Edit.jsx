@@ -8,8 +8,8 @@ export default function Edit({ posts, setPosts }) {
   const { id } = useParams();
   const post = posts.find((post) => post.id === id);
 
-  const [editedTitle, setEditedTitle] = useState(post.title);
-  const [editedContent, setEditedContent] = useState(post.content);
+  const [editedTitle, setEditedTitle] = useState(post?.title || "");
+  const [editedContent, setEditedContent] = useState(post?.content || "");
 
   const onChangeEditedTitle = (event) => {
     setEditedTitle(event.target.value);
@@ -24,7 +24,14 @@ export default function Edit({ posts, setPosts }) {
         return { ...post, title: editedTitle, content: editedContent };
       } else return post;
     });
-    setPosts(newPosts);
+    // setPosts(newPosts);
+    setPosts((바로직전데이터) => {
+      return 바로직전데이터.map((post) => {
+        if (post.id === id) {
+          return { ...post, title: editedTitle, content: editedContent };
+        } else return post;
+      });
+    });
     navigate("/");
   };
 
