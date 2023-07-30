@@ -2,29 +2,39 @@ import React, { Fragment, useState } from "react";
 import Header from "../common/Header";
 import Container from "../common/Container";
 import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { editPost } from "../redux/modules/postSlice";
 
-export default function Edit({ posts, setPosts }) {
-  const navigate = useNavigate();
+export default function Edit() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const posts = useSelector((state) => state.posts);
   const post = posts.find((post) => post.id === id);
-
-  const [editedTitle, setEditedTitle] = useState(post.title);
-  const [editedContent, setEditedContent] = useState(post.content);
-
-  const onChangeEditedTitle = (event) => {
-    setEditedTitle(event.target.value);
+  const [editInputs, setEditInputs] = useState({
+    editTitle: post?.title || "",
+    editContent: post?.content || "",
+  });
+  const editChangeHandler = (e) => {
+    const { value, name } = e.target;
+    setEditInputs({
+      ...editInputs,
+      [name]: value,
+    });
   };
-  const onChangeEditedContent = (event) => {
-    setEditedContent(event.target.value);
-  };
 
+  // 수정
   const EditButton = () => {
     const newPosts = posts.map((post) => {
       if (post.id === id) {
-        return { ...post, title: editedTitle, content: editedContent };
+        return {
+          ...post,
+          title: editInputs.editTitle,
+          content: editInputs.editContent,
+        };
       } else return post;
     });
-    setPosts(newPosts);
+    dispatch(editPost(newPosts));
     navigate("/");
   };
 
@@ -46,8 +56,9 @@ export default function Edit({ posts, setPosts }) {
         >
           <div>
             <input
-              value={editedTitle}
-              onChange={onChangeEditedTitle}
+              name="editTitle"
+              value={editInputs.editTitle}
+              onChange={editChangeHandler}
               placeholder="제목"
               style={{
                 width: "100%",
@@ -66,8 +77,9 @@ export default function Edit({ posts, setPosts }) {
             }}
           >
             <textarea
-              value={editedContent}
-              onChange={onChangeEditedContent}
+              name="editContent"
+              value={editInputs.editContent}
+              onChange={editChangeHandler}
               placeholder="내용"
               style={{
                 resize: "none",

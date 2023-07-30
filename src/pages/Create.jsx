@@ -3,26 +3,32 @@ import Header from "../common/Header";
 import Container from "../common/Container";
 import { nanoid } from "nanoid";
 import { useNavigate } from "react-router-dom";
+import { addPost } from "../redux/modules/postSlice";
+import { useDispatch } from "react-redux";
 
-export default function Create({ posts, setPosts }) {
+export default function Create() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-
-  const onChangeTitle = (event) => {
-    setTitle(event.target.value);
+  const [inputs, setInputs] = useState({
+    title: "",
+    content: "",
+  });
+  const changeHandler = (e) => {
+    const { value, name } = e.target;
+    setInputs({
+      ...inputs,
+      [name]: value,
+    });
   };
-  const onChangeContent = (event) => {
-    setContent(event.target.value);
-  };
 
+  // 추가
   const addButton = () => {
     const newPost = {
       id: nanoid(),
-      title,
-      content,
+      ...inputs,
     };
-    setPosts([...posts, newPost]);
+    dispatch(addPost(newPost));
+    navigate("/");
   };
 
   return (
@@ -43,8 +49,9 @@ export default function Create({ posts, setPosts }) {
         >
           <div>
             <input
-              value={title}
-              onChange={onChangeTitle}
+              name="title"
+              value={inputs.title}
+              onChange={changeHandler}
               placeholder="제목"
               style={{
                 width: "100%",
@@ -63,8 +70,9 @@ export default function Create({ posts, setPosts }) {
             }}
           >
             <textarea
-              value={content}
-              onChange={onChangeContent}
+              name="content"
+              value={inputs.content}
+              onChange={changeHandler}
               placeholder="내용"
               style={{
                 resize: "none",
@@ -90,7 +98,6 @@ export default function Create({ posts, setPosts }) {
             }}
             onClick={() => {
               addButton();
-              navigate("/");
             }}
           >
             추가하기

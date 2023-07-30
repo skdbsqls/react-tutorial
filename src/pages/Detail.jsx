@@ -2,17 +2,26 @@ import React from "react";
 import Header from "../common/Header";
 import Container from "../common/Container";
 import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { deletePost } from "../redux/modules/postSlice";
 
-export default function Detail({ posts, setPosts }) {
-  const navigate = useNavigate();
+export default function Detail() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const posts = useSelector((state) => state.posts);
   const post = posts.find((post) => post.id === id);
 
+  // 삭제
   const deleteButton = (id) => {
-    const newPosts = posts.filter((post) => post.id !== id);
-    setPosts(newPosts);
+    alert("삭제할까?");
+    dispatch(deletePost(id));
+    navigate("/");
   };
 
+  if (!post) {
+    return <div>해당 게시물은 존재하지 않습니다.</div>;
+  }
   return (
     <>
       <Header />
@@ -24,7 +33,8 @@ export default function Detail({ posts, setPosts }) {
             padding: "12px",
           }}
         >
-          {post.title}
+          {/* 에러 발생 가능성이 있음 -> 사용자 경험에 안좋을 수 있음 */}
+          {post?.title}
         </h1>
         <div
           style={{
@@ -34,7 +44,7 @@ export default function Detail({ posts, setPosts }) {
             padding: "12px",
           }}
         >
-          {post.content}
+          {post?.content}
         </div>
         <div
           style={{
@@ -61,9 +71,7 @@ export default function Detail({ posts, setPosts }) {
           </button>
           <button
             onClick={() => {
-              alert("삭제할까?");
               deleteButton(post.id);
-              navigate("/");
             }}
             style={{
               border: "none",

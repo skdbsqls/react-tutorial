@@ -1,13 +1,17 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import Header from "../common/Header";
 import Container from "../common/Container";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { deletePost } from "../redux/modules/postSlice";
 
-export default function Main({ posts, setPosts }) {
+export default function Main() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const posts = useSelector((state) => state.posts);
   const deleteButton = (id) => {
-    const newPosts = posts.filter((post) => post.id !== id);
-    setPosts(newPosts);
+    alert("삭제할까?");
+    dispatch(deletePost(id));
   };
 
   return (
@@ -101,7 +105,6 @@ export default function Main({ posts, setPosts }) {
                 </button>
                 <button
                   onClick={() => {
-                    alert("삭제할까?");
                     deleteButton(post.id);
                   }}
                   style={{
