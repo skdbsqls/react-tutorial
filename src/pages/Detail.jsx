@@ -2,22 +2,23 @@ import React from "react";
 import Header from "../common/Header";
 import Container from "../common/Container";
 import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { deletePost } from "../redux/modules/postSlice";
 
-export default function Detail({ posts, setPosts }) {
-  const navigate = useNavigate();
+export default function Detail() {
   const { id } = useParams();
-
-  // find는 undefined가 될 수 있음 따라서 undefined 일 때의 처리를 해줘야 됨
-  // 처리해주지 않고 오류를 내버리면 사용자 입장에서 좋지 않기 때문!!
-  // ? 옵션널체이닝으로 처리해 주거나
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const posts = useSelector((state) => state.posts);
   const post = posts.find((post) => post.id === id);
 
+  // 삭제
   const deleteButton = (id) => {
-    const newPosts = posts.filter((post) => post.id !== id);
-    setPosts(newPosts);
+    alert("삭제할까?");
+    dispatch(deletePost(id));
+    navigate("/");
   };
 
-  // 존재 하지 않을 경우에 알맞는 페이지?를 처리해주기
   if (!post) {
     return <div>해당 게시물은 존재하지 않습니다.</div>;
   }
@@ -70,9 +71,7 @@ export default function Detail({ posts, setPosts }) {
           </button>
           <button
             onClick={() => {
-              alert("삭제할까?");
               deleteButton(post.id);
-              navigate("/");
             }}
             style={{
               border: "none",

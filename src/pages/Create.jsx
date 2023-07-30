@@ -3,27 +3,16 @@ import Header from "../common/Header";
 import Container from "../common/Container";
 import { nanoid } from "nanoid";
 import { useNavigate } from "react-router-dom";
+import { addPost } from "../redux/modules/postSlice";
+import { useDispatch } from "react-redux";
 
-export default function Create({ posts, setPosts }) {
+export default function Create() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  // const [title, setTitle] = useState("");
-  // const [content, setContent] = useState("");
-
-  // const onChangeTitle = (event) => {
-  //   setTitle(event.target.value);
-  // };
-  // const onChangeContent = (event) => {
-  //   setContent(event.target.value);
-  // };
-
-  // 위를 아래처럼 한 번에 처리해주기!!
-  // 데이터를 한 번에 묶어서 처리하려면? 객체!!
   const [inputs, setInputs] = useState({
     title: "",
     content: "",
   });
-
-  // name 부여해줌으로써 onChangeHandler로 한 번에 할 수 있음!
   const changeHandler = (e) => {
     const { value, name } = e.target;
     setInputs({
@@ -32,14 +21,14 @@ export default function Create({ posts, setPosts }) {
     });
   };
 
+  // 추가
   const addButton = () => {
     const newPost = {
       id: nanoid(),
       ...inputs,
-      // title: inputs.title,
-      // content: inputs.content,
     };
-    setPosts([...posts, newPost]);
+    dispatch(addPost(newPost));
+    navigate("/");
   };
 
   return (
@@ -61,7 +50,7 @@ export default function Create({ posts, setPosts }) {
           <div>
             <input
               name="title"
-              value={title}
+              value={inputs.title}
               onChange={changeHandler}
               placeholder="제목"
               style={{
@@ -82,7 +71,7 @@ export default function Create({ posts, setPosts }) {
           >
             <textarea
               name="content"
-              value={content}
+              value={inputs.content}
               onChange={changeHandler}
               placeholder="내용"
               style={{
@@ -109,7 +98,6 @@ export default function Create({ posts, setPosts }) {
             }}
             onClick={() => {
               addButton();
-              navigate("/");
             }}
           >
             추가하기
