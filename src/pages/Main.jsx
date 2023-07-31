@@ -89,7 +89,7 @@ export default function Main() {
               <div>
                 <button
                   onClick={() => {
-                    navigate(`/edit/${post.id}`);
+                    navigate(`/edit`, { state: post });
                   }}
                   style={{
                     border: "none",

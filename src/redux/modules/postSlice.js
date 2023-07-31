@@ -43,7 +43,15 @@ const postSlice = createSlice({
       return state.filter((post) => post.id !== action.payload);
     },
     editPost: (state, action) => {
-      return (state = action.payload);
+      return state.map((post) => {
+        if (post.id === action.payload.id) {
+          return {
+            ...post,
+            title: action.payload.title,
+            content: action.payload.content,
+          };
+        } else return post;
+      });
     },
   },
 });

@@ -1,16 +1,14 @@
 import React, { Fragment, useState } from "react";
 import Header from "../common/Header";
 import Container from "../common/Container";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { editPost } from "../redux/modules/postSlice";
 
 export default function Edit() {
-  const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const posts = useSelector((state) => state.posts);
-  const post = posts.find((post) => post.id === id);
+  const post = useLocation().state;
   const [editInputs, setEditInputs] = useState({
     editTitle: post?.title || "",
     editContent: post?.content || "",
@@ -25,16 +23,12 @@ export default function Edit() {
 
   // 수정
   const EditButton = () => {
-    const newPosts = posts.map((post) => {
-      if (post.id === id) {
-        return {
-          ...post,
-          title: editInputs.editTitle,
-          content: editInputs.editContent,
-        };
-      } else return post;
-    });
-    dispatch(editPost(newPosts));
+    const newPost = {
+      ...post,
+      title: editInputs.editTitle,
+      content: editInputs.editContent,
+    };
+    dispatch(editPost(newPost));
     navigate("/");
   };
 

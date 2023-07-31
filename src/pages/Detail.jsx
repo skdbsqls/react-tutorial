@@ -33,7 +33,6 @@ export default function Detail() {
             padding: "12px",
           }}
         >
-          {/* 에러 발생 가능성이 있음 -> 사용자 경험에 안좋을 수 있음 */}
           {post?.title}
         </h1>
         <div
@@ -55,7 +54,7 @@ export default function Detail() {
         >
           <button
             onClick={() => {
-              navigate(`/edit/${post.id}`);
+              navigate(`/edit`, { state: post });
             }}
             style={{
               border: "none",
