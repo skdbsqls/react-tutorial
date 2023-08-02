@@ -1,17 +1,51 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../common/Header";
 import Container from "../common/Container";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { deletePost } from "../redux/modules/postSlice";
+import { auth } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function Main() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [email, setEmail] = useState("");
   const posts = useSelector((state) => state.posts);
-  const deleteButton = (id) => {
-    alert("삭제할까?");
-    dispatch(deletePost(id));
+
+  const deleteButton = (post) => {
+    // 삭제 권한 확인
+    if (post.author !== email) {
+      return alert("삭제 권한이 없습니다.");
+    } else {
+      alert("게시물을 삭제하시겠습니까?");
+      dispatch(deletePost(post.id));
+    }
+  };
+
+  // 사용자 유무 확인
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      setEmail(user?.email);
+    });
+  }, []);
+
+  // 추가 버튼
+  const addButton = () => {
+    // 로그인 되어 있지 않은 경우
+    if (!email) {
+      return alert("로그인을 해주세요.");
+    }
+    // 로그인 되어 있는 경우
+    else navigate("/create");
+  };
+
+  // 수정 버튼
+  const editButton = (post) => {
+    // 수정 권한 확인
+    if (post.author !== email) {
+      return alert("수정 권한이 없습니다.");
+    } else navigate(`/edit`, { state: post });
   };
 
   return (
@@ -26,9 +60,7 @@ export default function Main() {
           }}
         >
           <button
-            onClick={() => {
-              navigate("/create");
-            }}
+            onClick={addButton}
             style={{
               border: "none",
               padding: "8px",
@@ -88,9 +120,7 @@ export default function Main() {
               <div>{post.author}</div>
               <div>
                 <button
-                  onClick={() => {
-                    navigate(`/edit`, { state: post });
-                  }}
+                  onClick={() => editButton(post)}
                   style={{
                     border: "none",
                     padding: "8px",
@@ -105,7 +135,7 @@ export default function Main() {
                 </button>
                 <button
                   onClick={() => {
-                    deleteButton(post.id);
+                    deleteButton(post);
                   }}
                   style={{
                     border: "none",

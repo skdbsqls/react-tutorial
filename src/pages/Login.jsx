@@ -1,8 +1,61 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "../common/Header";
 import Container from "../common/Container";
+import { useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
 
 export default function Login() {
+  const navigate = useNavigate();
+
+  // 입력값 받기
+  const [userInputs, setUserInputs] = useState({
+    email: "",
+    password: "",
+  });
+  const userChangeHandler = (e) => {
+    const { value, name } = e.target;
+    setUserInputs({
+      ...userInputs,
+      [name]: value,
+    });
+  };
+
+  // 로그인 버튼
+  const loginButton = async (e) => {
+    e.preventDefault();
+    // 입력값 검사
+    if (!userInputs.email) {
+      return alert("이메일을 입력해주세요.");
+    }
+    if (!userInputs.password) {
+      return alert("비밀번호를 입력해주세요.");
+    }
+    // 로그인 성공
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        userInputs.email,
+        userInputs.password
+      );
+      // 입력값 초기화
+      setUserInputs({
+        email: "",
+        password: "",
+      });
+      // 홈으로 이동
+      navigate("/");
+    } catch (error) {
+      // 로그인 실패 (에러 처리)
+      if (error.message === "Firebase: Error (auth/user-not-found).") {
+        return alert("일치하는 유저의 정보가 없습니다.");
+      }
+      if (error.message === "Firebase: Error (auth/wrong-password).") {
+        return alert("비밀번호가 일치하지 않습니다.");
+      }
+    }
+  };
+
   return (
     <>
       <Header />
@@ -23,6 +76,9 @@ export default function Login() {
               }}
             >
               <input
+                name="email"
+                value={userInputs.email}
+                onChange={userChangeHandler}
                 placeholder="이메일"
                 style={{
                   width: "100%",
@@ -42,6 +98,9 @@ export default function Login() {
               }}
             >
               <input
+                name="password"
+                value={userInputs.password}
+                onChange={userChangeHandler}
                 placeholder="비밀번호"
                 type="password"
                 style={{
@@ -62,6 +121,7 @@ export default function Login() {
               }}
             >
               <button
+                onClick={loginButton}
                 style={{
                   width: "100%",
                   border: "none",
