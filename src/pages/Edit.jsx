@@ -1,8 +1,8 @@
 import React, { Fragment, useState } from "react";
 import Header from "../common/Header";
 import Container from "../common/Container";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { editPost } from "../redux/modules/postSlice";
 
 export default function Edit() {
