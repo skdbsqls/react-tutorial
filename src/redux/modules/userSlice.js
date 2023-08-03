@@ -1,16 +1,19 @@
+// 리덕스로 회원 정보 관리하기!!
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = [{}];
+const initialState = {
+  email: null,
+};
 
 const userSlice = createSlice({
-  name: "users",
+  name: "user",
   initialState,
   reducers: {
-    setCurrentUser: (state, action) => {
-      state.push(action.payload);
+    setUser: (state, action) => {
+      state.email = action.payload;
     },
   },
 });
 
-export const { setCurrentUser } = userSlice.actions;
+export const { setUser } = userSlice.actions;
 export default userSlice.reducer;

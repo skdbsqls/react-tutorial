@@ -5,6 +5,14 @@ import { auth } from "../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 
+const errorCode = {
+  "auth/email-already-in-use": "이미 가입한 이메일입니다.",
+  "auth/invalid-email": "이메일 형식이 올바르지 않습니다.",
+  "auth/operation-not-allowed":
+    "이메일과 비밀번호 계정이 활성화되지 않았습니다.",
+  "auth/weak-password": "비밀번호는 6자리 이상으로 입력해주세요.",
+};
+
 export default function Signup() {
   const navigate = useNavigate();
 
@@ -12,33 +20,37 @@ export default function Signup() {
   const [userInputs, setUserInputs] = useState({
     email: "",
     password: "",
-    checkpassword: "",
+    passwordConfirm: "",
   });
   const userChangeHandler = (e) => {
     const { value, name } = e.target;
-    setUserInputs({
-      ...userInputs,
-      [name]: value,
+    setUserInputs((prev) => {
+      return {
+        ...prev,
+        [name]: value,
+      };
     });
   };
 
   // 회원가입 버튼
   const singupButton = async (e) => {
     e.preventDefault();
-    // 입력값 검사
+    // 유효성 검사
     if (!userInputs.email) {
       return alert("이메일을 입력해주세요.");
     }
-    if (!userInputs.password || !userInputs.checkpassword) {
-      return alert("비밀번호와 비밀번호 확인란을 모두 입력해주세요.");
+    if (!userInputs.password) {
+      return alert("비밀번호를 입력해주세요.");
     }
-    // 비밀번호 확인
-    if (userInputs.password !== userInputs.checkpassword) {
+    if (!userInputs.passwordConfirm) {
+      return alert("비밀번호 확인을 입력해주세요.");
+    }
+    if (userInputs.password !== userInputs.passwordConfirm) {
       return alert("비밀번호가 일치하지 않습니다.");
     }
     // 회원가입 성공
     try {
-      const userCredential = await createUserWithEmailAndPassword(
+      await createUserWithEmailAndPassword(
         auth,
         userInputs.email,
         userInputs.password
@@ -47,23 +59,16 @@ export default function Signup() {
       setUserInputs({
         email: "",
         password: "",
-        checkpassword: "",
+        passwordConfirm: "",
       });
       // 홈으로 이동
       navigate("/");
     } catch (error) {
-      // 회원가입 실패 (에러 처리)
-      if (error.message === "Firebase: Error (auth/invalid-email).") {
-        return alert("이메일 형식이 올바르지 않습니다.");
-      }
-      if (
-        error.message ===
-        "Firebase: Password should be at least 6 characters (auth/weak-password)."
-      ) {
-        return alert("비밀번호는 6자리 이상으로 입력해주세요.");
-      }
-      if (error.message === "Firebase: Error (auth/email-already-in-use).") {
-        return alert("이미 가입한 이메일입니다.");
+      // 내가 설정한 에러코드가 아닌 다른 종류의 에러가 있을 경우도 대비!
+      if (errorCode[error.code]) {
+        alert(errorCode[error.code]);
+      } else {
+        alert("알 수 없는 오류입니다. 나중에 다시 시도해주세요.");
       }
     }
   };
@@ -133,8 +138,8 @@ export default function Signup() {
               }}
             >
               <input
-                name="checkpassword"
-                value={userInputs.checkpassword}
+                name="passwordConfirm"
+                value={userInputs.passwordConfirm}
                 onChange={userChangeHandler}
                 placeholder="비밀번호 확인"
                 type="password"
