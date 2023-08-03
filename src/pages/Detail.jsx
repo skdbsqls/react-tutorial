@@ -1,41 +1,36 @@
-import React, { useState } from "react";
+import React from "react";
 import Header from "../common/Header";
 import Container from "../common/Container";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { deletePost } from "../redux/modules/postSlice";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../firebase";
 
 export default function Detail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [email, setEmail] = useState("");
+  const user = useSelector((state) => state.user);
   const posts = useSelector((state) => state.posts);
   const post = posts.find((post) => post.id === id);
-
-  // 유저의 이메일 셋팅
-  onAuthStateChanged(auth, (user) => {
-    setEmail(user.email);
-  });
 
   // 삭제
   const deleteButton = (post) => {
     // 삭제 권한 확인
-    if (post.author !== email) {
+    if (post.author !== user.email) {
       return alert("삭제 권한이 없습니다.");
     } else {
-      alert("게시물을 삭제하시겠습니까?");
-      dispatch(deletePost(post.id));
-      navigate("/");
+      const deleteConfirm = window.confirm("게시물을 삭제하시겠습니까?");
+      if (deleteConfirm) {
+        dispatch(deletePost(post.id));
+        navigate("/");
+      }
     }
   };
 
   // 수정
   const editButton = (post) => {
     // 수정 권한 확인
-    if (post.author !== email) {
+    if (post.author !== user.email) {
       return alert("수정 권한이 없습니다.");
     } else navigate(`/edit`, { state: post });
   };
