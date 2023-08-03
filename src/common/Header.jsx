@@ -1,18 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { FaHome } from "react-icons/fa";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
+import { useSelector } from "react-redux";
 
 export default function Header() {
-  const [currentUser, setCurrentUser] = useState(null);
-
-  // 사용자 유무 확인
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user?.email);
-    });
-  }, []);
+  const user = useSelector((state) => state.user);
 
   // 로그아웃
   const logoutButton = async (e) => {
@@ -47,8 +41,11 @@ export default function Header() {
         }}
       >
         {/* 사용자 유무에 따른 버튼 */}
-        {currentUser ? (
-          <button onClick={logoutButton}>로그아웃</button>
+        {user.email ? (
+          <>
+            <div>{user.email}</div>
+            <button onClick={logoutButton}>로그아웃</button>
+          </>
         ) : (
           <>
             <Link to="/login">로그인</Link>

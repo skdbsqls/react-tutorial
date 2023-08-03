@@ -24,7 +24,7 @@ export default function Login() {
   // 로그인 버튼
   const loginButton = async (e) => {
     e.preventDefault();
-    // 입력값 검사
+    // 유효성 검사
     if (!userInputs.email) {
       return alert("이메일을 입력해주세요.");
     }
@@ -33,7 +33,7 @@ export default function Login() {
     }
     // 로그인 성공
     try {
-      const userCredential = await signInWithEmailAndPassword(
+      await signInWithEmailAndPassword(
         auth,
         userInputs.email,
         userInputs.password
@@ -46,11 +46,17 @@ export default function Login() {
       // 홈으로 이동
       navigate("/");
     } catch (error) {
-      // 로그인 실패 (에러 처리)
-      if (error.message === "Firebase: Error (auth/user-not-found).") {
+      // 로그인 실패 (에러 처리) -> 에러 코드로 바꾸기
+      if (error.code === "auth/invalid-email") {
+        return alert("이메일 주소가 유효하지 않습니다.");
+      }
+      if (error.code === "auth/user-disabled") {
+        return alert("해당 이메일의 사용자는 비활성화되어 있습니다.");
+      }
+      if (error.code === "auth/user-not-found") {
         return alert("일치하는 유저의 정보가 없습니다.");
       }
-      if (error.message === "Firebase: Error (auth/wrong-password).") {
+      if (error.code === "auth/wrong-password") {
         return alert("비밀번호가 일치하지 않습니다.");
       }
     }

@@ -4,14 +4,12 @@ import Container from "../common/Container";
 import { nanoid } from "nanoid";
 import { useNavigate } from "react-router-dom";
 import { addPost } from "../redux/modules/postSlice";
-import { useDispatch } from "react-redux";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../firebase";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function Create() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const user = useSelector((state) => state.user);
   const [inputs, setInputs] = useState({
     title: "",
     content: "",
@@ -24,16 +22,11 @@ export default function Create() {
     });
   };
 
-  // 유저의 이메일 셋팅
-  onAuthStateChanged(auth, (user) => {
-    setEmail(user.email);
-  });
-
   // 추가
   const addButton = () => {
     const newPost = {
       id: nanoid(),
-      author: email,
+      author: user.email,
       ...inputs,
     };
     dispatch(addPost(newPost));
