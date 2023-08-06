@@ -1,16 +1,25 @@
 import React from "react";
 import Header from "../common/Header";
 import Container from "../common/Container";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { deletePost } from "../redux/modules/postSlice";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { getPosts, deletePost } from "../axios/post";
 
 export default function Main() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
-  const posts = useSelector((state) => state.posts);
 
+  // Post 조회
+  const { isLoading, isError, data: posts } = useQuery("posts", getPosts);
+
+  // Post 삭제
+  const queryClient = useQueryClient();
+  const deleteMutation = useMutation(deletePost, {
+    onSuccess: () => {
+      queryClient.invalidateQueries("posts");
+    },
+  });
   const deleteButton = (post) => {
     // 삭제 권한 확인
     if (post.author !== user.email) {
@@ -18,8 +27,7 @@ export default function Main() {
     } else {
       const deleteConfirm = window.confirm("게시물을 삭제하시겠습니까?");
       if (deleteConfirm) {
-        dispatch(deletePost(post.id));
-        navigate("/");
+        deleteMutation.mutate(post.id);
       }
     }
   };
@@ -42,6 +50,12 @@ export default function Main() {
     } else navigate(`/edit`, { state: post });
   };
 
+  if (isLoading) {
+    return <h1>로딩중입니다!</h1>;
+  }
+  if (isError) {
+    return <h1>에러 발생!!</h1>;
+  }
   return (
     <>
       <Header />

@@ -2,18 +2,30 @@ import React from "react";
 import Header from "../common/Header";
 import Container from "../common/Container";
 import { useNavigate, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { deletePost } from "../redux/modules/postSlice";
+import { useSelector } from "react-redux";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { getDetailPost, deletePost } from "../axios/post";
 
 export default function Detail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
-  const posts = useSelector((state) => state.posts);
-  const post = posts.find((post) => post.id === id);
+
+  // 상세 조회
+  const {
+    isLoading,
+    isError,
+    data: post,
+  } = useQuery(["posts", id], () => getDetailPost(id));
 
   // 삭제
+  // Post 삭제
+  const queryClient = useQueryClient();
+  const deleteMutation = useMutation(deletePost, {
+    onSuccess: () => {
+      queryClient.invalidateQueries("posts");
+    },
+  });
   const deleteButton = (post) => {
     // 삭제 권한 확인
     if (post.author !== user.email) {
@@ -21,7 +33,7 @@ export default function Detail() {
     } else {
       const deleteConfirm = window.confirm("게시물을 삭제하시겠습니까?");
       if (deleteConfirm) {
-        dispatch(deletePost(post.id));
+        deleteMutation.mutate(post.id);
         navigate("/");
       }
     }
@@ -35,8 +47,11 @@ export default function Detail() {
     } else navigate(`/edit`, { state: post });
   };
 
-  if (!post) {
-    return <div>해당 게시물은 존재하지 않습니다.</div>;
+  if (isLoading) {
+    return <h1>로딩중입니다!</h1>;
+  }
+  if (isError) {
+    return <h1>에러 발생!!</h1>;
   }
   return (
     <>
@@ -49,7 +64,7 @@ export default function Detail() {
             padding: "12px",
           }}
         >
-          {post?.title}
+          {post.title}
         </h1>
         <div
           style={{
@@ -59,7 +74,7 @@ export default function Detail() {
             padding: "12px",
           }}
         >
-          {post?.content}
+          {post.content}
         </div>
         <div
           style={{

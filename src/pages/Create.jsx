@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import Header from "../common/Header";
 import Container from "../common/Container";
-import { nanoid } from "nanoid";
 import { useNavigate } from "react-router-dom";
-import { addPost } from "../redux/modules/postSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
+import { useMutation, useQueryClient } from "react-query";
+import { createPost } from "../axios/post";
 
 export default function Create() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
   const [inputs, setInputs] = useState({
@@ -23,13 +22,18 @@ export default function Create() {
   };
 
   // 추가
+  const queryClient = useQueryClient();
+  const createMutation = useMutation(createPost, {
+    onSuccess: () => {
+      queryClient.invalidateQueries("posts");
+    },
+  });
   const addButton = () => {
     const newPost = {
-      id: nanoid(),
       author: user.email,
       ...inputs,
     };
-    dispatch(addPost(newPost));
+    createMutation.mutate(newPost);
     navigate("/");
   };
 

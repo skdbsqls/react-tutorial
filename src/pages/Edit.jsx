@@ -2,12 +2,11 @@ import React, { Fragment, useState } from "react";
 import Header from "../common/Header";
 import Container from "../common/Container";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { editPost } from "../redux/modules/postSlice";
+import { useMutation, useQueryClient } from "react-query";
+import { updatePost } from "../axios/post";
 
 export default function Edit() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const post = useLocation().state;
   const [editInputs, setEditInputs] = useState({
     editTitle: post?.title || "",
@@ -22,13 +21,19 @@ export default function Edit() {
   };
 
   // 수정
+  const queryClient = useQueryClient();
+  const updateMutation = useMutation(updatePost, {
+    onSuccess: () => {
+      queryClient.invalidateQueries("posts");
+    },
+  });
   const EditButton = () => {
-    const newPost = {
+    const updatePost = {
       ...post,
       title: editInputs.editTitle,
       content: editInputs.editContent,
     };
-    dispatch(editPost(newPost));
+    updateMutation.mutate(updatePost);
     navigate("/");
   };
 
