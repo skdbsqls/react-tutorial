@@ -17,8 +17,8 @@ const createPost = async (newPost) => {
 
 // 상세 조회
 const getDetailPost = async (id) => {
-  const { data } = await base.get(`posts?id=${id}`);
-  return data[0];
+  const { data } = await base.get(`posts/${id}`);
+  return data;
 };
 
 // 삭제

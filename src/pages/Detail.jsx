@@ -18,7 +18,6 @@ export default function Detail() {
     data: post,
   } = useQuery(["posts", id], () => getDetailPost(id));
 
-  // 삭제
   // Post 삭제
   const queryClient = useQueryClient();
   const deleteMutation = useMutation(deletePost, {
